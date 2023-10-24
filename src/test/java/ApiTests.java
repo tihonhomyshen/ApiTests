@@ -15,20 +15,20 @@ public class ApiTests extends BaseTest {
 
 
     @Feature("GET")
-    @Test(description = "Проверка, что все имена на первой странице с пользователями на латинице", groups = {"GET"})
+    @Test(description = "Проверка, что все имена на первой странице с пользователями на латинице")
     public void CompareNames() {
         List<DataResponse> users = API_STEPS.getUserList();
         API_STEPS.englishNames(users);
     }
 
     @Feature("GET")
-    @Test(description = "Получение списка пользователей", groups = {"GET"})
+    @Test(description = "Получение списка пользователей")
     public void UsersList() {
         API_STEPS.getUserList();
     }
 
     @Feature("GET")
-    @Test(description = "Получение пользователя", groups = {"GET"})
+    @Test(description = "Получение пользователя")
     public void GetUser() {
         UserResponse actualResponse = API_STEPS.getUserById(2, 200);
         DataResponse dataResponse = new DataResponse(2, "janet.weaver@reqres.in", "Janet", "Weaver", "https://reqres.in/img/faces/2-image.jpg");
