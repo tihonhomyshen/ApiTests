@@ -1,8 +1,7 @@
 package steps;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.qameta.allure.Step;
 import model.RequestModel.JobRequest;
-import model.RequestModel.RegisterRequest;
+import model.RequestModel.LogRegRequest;
 import model.ResponseModel.*;
 import org.testng.Assert;
 
@@ -44,6 +43,16 @@ public class ApiSteps {
                 .then()
                 .assertThat()
                 .statusCode(statusCode).extract().response().body().as(UserResponse.class);
+    }
+
+    @Step("Список пользователей, полученный с задержкой в 3 секунды")
+    public List<DataResponse> getUserListDelay(){
+        return given()
+                .when()
+                .get("/api/users?delay=3")
+                .then()
+                .assertThat()
+                .statusCode(200).extract().response().body().jsonPath().getList("data", DataResponse.class);
     }
 
     @Step("Получить цвет по ID")
@@ -114,16 +123,52 @@ public class ApiSteps {
                 .statusCode(204).extract().response();
     }
 
-    @Step("Успешная регистрация")
-    public RegisterResponse successAuth(RegisterRequest registerRequest){
-            return given()
-                 .when()
-                 .body(registerRequest)
-                 .post("api/register")
-                 .then()
-                 .assertThat().log().all()
-                 .statusCode(200).extract().response().body().as(RegisterResponse.class);
+
+    @Step("Успешная регистрация и сравнение полученного токена")
+    public void regUser(LogRegRequest logRegRequest){
+        RegisterResponse actualResponse = given().when().
+                body(logRegRequest)
+                .contentType("application/json")
+                .post("api/register")
+                .then()
+                .statusCode(200).extract().response().body().as(RegisterResponse.class);
+        RegisterResponse expectedResponse = new RegisterResponse(4,  "QpwL5tke4Pnpja7X4" );
+        Assert.assertEquals(actualResponse.token, expectedResponse.token);
     }
 
+    @Step("Неверная регистрация и сравнение полученной ошибки")
+    public void regUserError(LogRegRequest logRegRequest){
+        ErrorResponse actualResponse = given().when().
+                body(logRegRequest)
+                .contentType("application/json")
+                .post("api/register")
+                .then()
+                .statusCode(400).extract().response().body().as(ErrorResponse.class);
+        Assert.assertEquals(actualResponse.error, "Missing password");
+    }
+
+    @Step("Успешная логин и сравнение полученного токена")
+    public void authUser(LogRegRequest logRegRequest){
+        LoginResponse actualResponse = given().when().
+                body(logRegRequest)
+                .contentType("application/json")
+                .post("api/login")
+                .then()
+                .statusCode(200).extract().response().body().as(LoginResponse .class);
+        LoginResponse expectedResponse = new LoginResponse("QpwL5tke4Pnpja7X4" );
+        Assert.assertEquals(actualResponse.token, expectedResponse.token);
+    }
+
+    @Step("Успешная логин и сравнение полученного токена")
+    public void authUserError(LogRegRequest logRegRequest){
+        ErrorResponse actualResponse = given().when().
+                body(logRegRequest)
+                .contentType("application/json")
+                .post("api/login")
+                .then()
+                .statusCode(400).extract().response().body().as(ErrorResponse .class);
+        ErrorResponse expectedResponse = new ErrorResponse("Missing password" );
+        Assert.assertEquals(actualResponse.error, expectedResponse.error);
+    }
 
 }

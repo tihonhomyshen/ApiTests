@@ -1,4 +1,4 @@
-package model.RequestModel;
+package model.ResponseModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
-    public String email;
-    public String password;
+public class LoginResponse {
+    public String token;
 }
